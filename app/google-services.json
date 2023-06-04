@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "32587312675",
+    "project_id": "btlandroid-5cd24",
+    "storage_bucket": "btlandroid-5cd24.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32587312675:android:187ecedb34156e18274b96",
+        "android_client_info": {
+          "package_name": "com.example.btl"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "32587312675-acmjun14chl15e0mussb18rbpssdbtct.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyClTacQwLdTZktOvRTTj6jNIfeDJ3P7RaE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "32587312675-acmjun14chl15e0mussb18rbpssdbtct.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
