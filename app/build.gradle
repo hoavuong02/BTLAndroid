@@ -44,4 +44,6 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
+    implementation'com.squareup.retrofit2:converter-gson:2.0.0-beta4'
+    implementation 'com.google.firebase:firebase-messaging-directboot:23.1.2'
 }
