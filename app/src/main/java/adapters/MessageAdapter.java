@@ -36,7 +36,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     @NonNull
     @Override
     public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if(viewType==MSG_TYPE_LEFT){
+        if(viewType==MSG_TYPE_RIGHT){
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_item_right, parent, false);
             return new MessageViewHolder(view);
         } else {
@@ -64,7 +64,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         if(!message.getText().toString().isEmpty()){
             holder.textViewContent.setText(message.getText());
-            holder.textViewContent.setVisibility(View.GONE);
+            holder.imageView.setVisibility(View.GONE);
             holder.btnDownload.setVisibility(View.GONE);
         } else if (!message.getmFileURL().toString().isEmpty()) {
 
