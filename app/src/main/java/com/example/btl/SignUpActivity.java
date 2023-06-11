@@ -30,9 +30,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import methods.FireStoreMethod;
 
 
 public class SignUpActivity extends AppCompatActivity {
@@ -45,6 +51,7 @@ public class SignUpActivity extends AppCompatActivity {
     Button btnSignUpPrimary;
 
     private FirebaseAuth mAuth;
+    private Uri selectedImageUri;
 
     FirebaseFirestore db;
 
@@ -139,24 +146,56 @@ public class SignUpActivity extends AppCompatActivity {
                                         // Lấy token thành công
                                         String token = task.getResult().getToken();
 
-                                        // Lưu dữ liệu vào Cloud Firestore
-                                        CollectionReference usersRef = db.collection("users");
-                                        User user = new User(userId,username,email,"",token); // Tạo đối tượng User với uid và token
-                                        usersRef.document(userId).set(user)
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void aVoid) {
-                                                        // Xử lý thành công
-                                                        Toast.makeText(getApplicationContext(), "Save data success. UserID: " + userId, Toast.LENGTH_SHORT).show();
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception e) {
-                                                        // Xử lý khi thất bại
-                                                        Toast.makeText(getApplicationContext(), "Save data failed", Toast.LENGTH_SHORT).show();
-                                                    }
-                                                });
+
+                                        // Lấy tham chiếu tới Firebase Storage
+                                        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+
+                                        // Tạo tên tệp tin duy nhất cho ảnh
+                                        String fileName = "image_" + System.currentTimeMillis() + ".jpg";
+
+                                        // Tạo tham chiếu tới thư mục lưu trữ trong Firebase Storage
+                                        StorageReference imageRef = storageRef.child("users/" + fileName);
+
+                                        // Tải ảnh lên Firebase Storage
+                                        UploadTask uploadTask = imageRef.putFile(selectedImageUri);
+                                        uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    // Lấy URL của ảnh đã tải lên từ Firebase Storage
+                                                    imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                        @Override
+                                                        public void onSuccess(Uri downloadUri) {
+                                                            // Tạo đối tượng User với uid và token
+
+                                                            User user = new User(userId,username,email,downloadUri.toString(),token);
+                                                            // Lưu dữ liệu vào Cloud Firestore
+                                                            CollectionReference usersRef = db.collection("users");
+                                                            usersRef.document(userId).set(user)
+                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                        @Override
+                                                                        public void onSuccess(Void aVoid) {
+                                                                            // Xử lý thành công
+                                                                            Toast.makeText(getApplicationContext(), "Save data success. UserID: " + userId, Toast.LENGTH_SHORT).show();
+                                                                        }
+                                                                    })
+                                                                    .addOnFailureListener(new OnFailureListener() {
+                                                                        @Override
+                                                                        public void onFailure(@NonNull Exception e) {
+                                                                            // Xử lý khi thất bại
+                                                                            Toast.makeText(getApplicationContext(), "Save data failed", Toast.LENGTH_SHORT).show();
+                                                                        }
+                                                                    });
+                                                        }
+                                                    });
+                                                } else {
+                                                    // Xử lý lỗi nếu tải lên không thành công
+                                                    Toast.makeText(SignUpActivity.this, "Upload failed: " + task.getException(), Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        });
+
+
                                     } else {
                                         // Xử lý khi không lấy được token
                                         Toast.makeText(getApplicationContext(), "Failed to get token", Toast.LENGTH_SHORT).show();
@@ -185,30 +224,14 @@ public class SignUpActivity extends AppCompatActivity {
 
     }
 
-    //Định nghĩa phương thức getRealPathFromURI() để lấy đường dẫn thực sự của ảnh từ Uri:
-    private String getRealPathFromURI(Uri contentUri) {
-        String[] proj = { MediaStore.Images.Media.DATA };
-        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
-        if (cursor == null) {
-            return contentUri.getPath();
-        } else {
-            cursor.moveToFirst();
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            String filePath = cursor.getString(column_index);
-            cursor.close();
-            return filePath;
-        }
-    }
-
     //Override phương thức onActivityResult() để nhận kết quả trả về từ Gallery:
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_CODE_SELECT_IMAGE && resultCode == RESULT_OK && data != null) {
-            Uri selectedImageUri = data.getData();
-//            selectedImagePath = getRealPathFromURI(selectedImageUri);
-//            Imgavartar.setImageURI(selectedImageUri);
+            selectedImageUri = data.getData();
+
 
             // Hiển thị ảnh lên ImageView
             avartarshow.setImageURI(selectedImageUri);

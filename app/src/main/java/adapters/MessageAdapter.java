@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.btl.MainActivity;
 import com.example.btl.R;
 import com.example.btl.User;
@@ -18,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import methods.FileHelper;
 import methods.FireStoreMethod;
 import models.Message;
@@ -53,6 +55,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         fireStoreMethod.getUserByUid(message.getSender(), new FireStoreMethod.DataCallback() {
             @Override
             public void onDataLoaded(User user) {
+                Glide.with(activity)
+                        .load(user.getPhotoUrl())
+                        .into(holder.imageViewSender);
                 holder.textViewSender.setText(user.getUsername());
             }
 
@@ -81,6 +86,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
                 }
             });
+        } else if (!message.getmPhotoURL().isEmpty()) {
+            holder.textViewContent.setVisibility(View.GONE);
+            holder.btnDownload.setVisibility(View.GONE);
+            Glide.with(activity)
+                    .load(message.getmPhotoURL())
+                    .into(holder.imageView);
         }
 
 
@@ -92,6 +103,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
+        CircleImageView imageViewSender;
         TextView textViewSender;
         TextView textViewContent;
         ImageView imageView;
@@ -99,6 +111,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
         public MessageViewHolder(View itemView) {
             super(itemView);
+            imageViewSender = itemView.findViewById(R.id.imageViewSender);
             textViewSender = itemView.findViewById(R.id.textViewSender);
             textViewContent = itemView.findViewById(R.id.textViewContent);
             imageView = itemView.findViewById(R.id.imageView);

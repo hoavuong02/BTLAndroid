@@ -1,6 +1,5 @@
 package com.example.btl;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,16 +10,14 @@ import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -38,6 +35,7 @@ import java.util.List;
 import adapters.MessageAdapter;
 import methods.FileHelper;
 import methods.FireStoreMethod;
+import methods.StorageMethod;
 import models.Message;
 
 public class MainActivity extends AppCompatActivity {
@@ -52,6 +50,11 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int PICK_FILE_REQUEST = 438;
     private static final long MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+
+    //send image
+    private static final int REQUEST_IMAGE_PICK = 1;
+    private Uri imageUri;
+
 
     private BroadcastReceiver downloadCompleteReceiver;
     @Override
@@ -99,6 +102,17 @@ public class MainActivity extends AppCompatActivity {
         buttonSendFile = findViewById(R.id.btnFile);
         fileHelper = new FileHelper(this, buttonSendFile);
 
+        //send image section
+        Button btnSendImage = findViewById(R.id.btnImage);
+        btnSendImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Mở hộp thoại chọn ảnh từ thiết bị
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, REQUEST_IMAGE_PICK);
+            }
+        });
+
         //send message section
         FireStoreMethod fireStoreMethod = new FireStoreMethod();
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -107,9 +121,9 @@ public class MainActivity extends AppCompatActivity {
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (text.getText().toString().isEmpty()) {
+                if (text.getText().toString().isEmpty() && imageUri ==null) {
                     Toast.makeText(MainActivity.this, "Please enter a message", Toast.LENGTH_SHORT).show();
-                } else {
+                } else if(!text.getText().toString().isEmpty() && imageUri ==null) {
                     fireStoreMethod.addMessage(text.getText().toString(), uid,"","","" ,new Date());
                     text.getText().clear();
                     text.clearFocus();
@@ -133,5 +147,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         fileHelper.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_IMAGE_PICK && resultCode == RESULT_OK && data != null) {
+            //set value for selectedImageUri
+            imageUri = data.getData();
+            StorageMethod storageMethod = new StorageMethod(imageUri,MainActivity.this);
+            storageMethod.uploadImage();
+        }
+
     }
 }
