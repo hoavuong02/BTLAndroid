@@ -42,4 +42,24 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@color/black" />
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="144dp"
+        android:layout_height="144dp"
+        android:layout_below="@id/textViewContent"
+        android:layout_alignStart="@id/textViewSender"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bubble_white"
+        android:src="@drawable/girl" />
+
+    <Button
+        android:id="@+id/buttonDownload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/imageView"
+        android:layout_alignStart="@id/textViewSender"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bubble_white"
+        android:text="Button"
+        android:textColor="@color/black" />
 </RelativeLayout>

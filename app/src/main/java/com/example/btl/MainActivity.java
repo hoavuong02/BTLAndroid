@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                 if (text.getText().toString().isEmpty()) {
                     Toast.makeText(MainActivity.this, "Please enter a message", Toast.LENGTH_SHORT).show();
                 } else {
-                    fireStoreMethod.addMessage(text.getText().toString(), uid, "text", new Date());
+                    fireStoreMethod.addMessage(text.getText().toString(), uid,"","","" ,new Date());
                     text.getText().clear();
                     text.clearFocus();
                 }

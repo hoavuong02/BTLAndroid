@@ -58,9 +58,9 @@ public class FireStoreMethod {
                     }
                 });
     }
-    public void addMessage(String mText, String mSender, String mType, Date mDate) {
+    public void addMessage(String mText, String mSender, String mPhotoURL, String mFileName, String mFileURL, Date mDate) {
 
-        Message message = new Message(mText, mSender, mType, mDate);
+        Message message = new Message(mText, mSender, "","","", mDate);
 
         // Get the collection reference
         CollectionReference collectionRef = firestore.collection("messages");

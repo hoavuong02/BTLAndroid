@@ -15,18 +15,24 @@ public class Message {
     private String mText;
     private String mSender;
 
-    private String mType;
+    private String mPhotoURL;
+    private String mFileName;
+    private String mFileURL;
     private Date mDate;
 
     public Message() {
     }
 
-    public Message(String mText, String mSender, String mType, Date mDate) {
+    public Message(String mText, String mSender, String mPhotoURL, String mFileName, String mFileURL, Date mDate) {
         this.mText = mText;
         this.mSender = mSender;
-        this.mType = mType;
+        this.mPhotoURL = mPhotoURL;
+        this.mFileName = mFileName;
+        this.mFileURL = mFileURL;
         this.mDate = mDate;
     }
+
+
 
     public String getText() {
         return mText;
@@ -44,12 +50,28 @@ public class Message {
         this.mSender = mSender;
     }
 
-    public String getmType() {
-        return mType;
+    public String getmPhotoURL() {
+        return mPhotoURL;
     }
 
-    public void setmType(String mType) {
-        this.mType = mType;
+    public void setmPhotoURL(String mPhotoURL) {
+        this.mPhotoURL = mPhotoURL;
+    }
+
+    public String getmFileName() {
+        return mFileName;
+    }
+
+    public void setmFileName(String mFileName) {
+        this.mFileName = mFileName;
+    }
+
+    public String getmFileURL() {
+        return mFileURL;
+    }
+
+    public void setmFileURL(String mFileURL) {
+        this.mFileURL = mFileURL;
     }
 
     public Date getDate() {

@@ -3,6 +3,8 @@ package adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -55,8 +57,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             }
         });
 
+        if(!message.getText().toString().isEmpty()){
+            holder.textViewContent.setText(message.getText());
+            holder.textViewContent.setVisibility(View.GONE);
+            holder.btnDownload.setVisibility(View.GONE);
+        }
 
-        holder.textViewContent.setText(message.getText());
     }
 
     @Override
@@ -67,11 +73,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
         TextView textViewSender;
         TextView textViewContent;
+        ImageView imageView;
+        Button btnDownload;
 
         public MessageViewHolder(View itemView) {
             super(itemView);
             textViewSender = itemView.findViewById(R.id.textViewSender);
             textViewContent = itemView.findViewById(R.id.textViewContent);
+            imageView = itemView.findViewById(R.id.imageView);
+            btnDownload=itemView.findViewById(R.id.buttonDownload);
         }
     }
     public int getItemViewType(int position){
