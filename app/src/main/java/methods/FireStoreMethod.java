@@ -60,7 +60,7 @@ public class FireStoreMethod {
     }
     public void addMessage(String mText, String mSender, String mPhotoURL, String mFileName, String mFileURL, Date mDate) {
 
-        Message message = new Message(mText, mSender, "","","", mDate);
+        Message message = new Message(mText, mSender, mPhotoURL,mFileName,mFileURL, mDate);
 
         // Get the collection reference
         CollectionReference collectionRef = firestore.collection("messages");
