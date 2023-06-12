@@ -1,5 +1,6 @@
 package com.example.btl;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,6 +18,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.firestore.CollectionReference;
@@ -25,8 +29,11 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.StorageReference;
+
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -125,8 +132,48 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Please enter a message", Toast.LENGTH_SHORT).show();
                 } else if(!text.getText().toString().isEmpty() && imageUri ==null) {
                     fireStoreMethod.addMessage(text.getText().toString(), uid,"","","" ,new Date());
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    CollectionReference usersRef = db.collection("users");
+
+                    usersRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                List<String> tokens = new ArrayList<>();
+
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    String userId = document.getString("uid");
+
+                                    if (!userId.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                                        String token = document.getString("token");
+                                        if (token != null) {
+                                            tokens.add(token);
+                                        }
+                                    }
+                                }
+
+                                // Handle the list of tokens here
+                                // tokens list contains all the tokens except the current user's token
+                                try {
+                                    MyFirebaseMessagingService.sendNotification(tokens);
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
+                                try {
+                                    MyFirebaseMessagingService.sendNotification(tokens);
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            } else {
+                                // Handle the error
+                                // task.getException() contains the exception occurred during the query
+                            }
+                        }
+                    });
+
                     text.getText().clear();
                     text.clearFocus();
+
                 }
             }
         });
@@ -137,7 +184,18 @@ public class MainActivity extends AppCompatActivity {
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
+
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                CollectionReference usersRef = db.collection("users");
+
+                Task<Void> deleteTokenTask = usersRef.document(uid).update("token", null);
+                deleteTokenTask.addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        // Token deletion successful
+                        FirebaseAuth.getInstance().signOut();
+                    }
+                });
                 Intent intent = new Intent(MainActivity.this,LoginActivity.class);
                 startActivity(intent);
                 finish();
@@ -153,6 +211,7 @@ public class MainActivity extends AppCompatActivity {
             imageUri = data.getData();
             StorageMethod storageMethod = new StorageMethod(imageUri,MainActivity.this);
             storageMethod.uploadImage();
+            imageUri=null;
         }
 
     }

@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,6 +31,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -136,17 +138,18 @@ public class SignUpActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if(task.isSuccessful()){
 
-                        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-                        if (firebaseUser != null) {
-                            String userId = firebaseUser.getUid();
-                            firebaseUser.getIdToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<GetTokenResult> task) {
-                                    if (task.isSuccessful()) {
-                                        // Lấy token thành công
-                                        String token = task.getResult().getToken();
+                        FirebaseMessaging.getInstance().getToken()
+                                .addOnCompleteListener(new OnCompleteListener<String>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<String> task) {
+                                        if (!task.isSuccessful()) {
+                                            Log.w("MainActivity", "Failed to retrieve FCM registration token", task.getException());
+                                            return;
+                                        }
 
+                                        String token = task.getResult();
 
+                                        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                                         // Lấy tham chiếu tới Firebase Storage
                                         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
 
@@ -194,17 +197,8 @@ public class SignUpActivity extends AppCompatActivity {
                                                 }
                                             }
                                         });
-
-
-                                    } else {
-                                        // Xử lý khi không lấy được token
-                                        Toast.makeText(getApplicationContext(), "Failed to get token", Toast.LENGTH_SHORT).show();
                                     }
-                                }
-                            });
-                        }
-
-
+                                });
 
                         //thông báo tạo tài khoản thành công và chuyển hướng
                         Toast.makeText(getApplicationContext(),"Create Account success :))", Toast.LENGTH_SHORT).show();
