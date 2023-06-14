@@ -159,11 +159,8 @@ public class MainActivity extends AppCompatActivity {
                                 } catch (JSONException e) {
                                     throw new RuntimeException(e);
                                 }
-                                try {
-                                    MyFirebaseMessagingService.sendNotification(tokens);
-                                } catch (JSONException e) {
-                                    throw new RuntimeException(e);
-                                }
+
+
                             } else {
                                 // Handle the error
                                 // task.getException() contains the exception occurred during the query
