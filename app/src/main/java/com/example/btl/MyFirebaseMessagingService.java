@@ -3,6 +3,8 @@ package com.example.btl;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
@@ -44,30 +46,35 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private void showNotification(String title, String body) {
         // Create a unique channel ID for the notification
         String channelId = UUID.randomUUID().toString();
-        ;
         String channelName = "My Channel";
 
         // Create the notification channel (required for Android Oreo and above)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = null;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT);
-            }
+            NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                notificationManager.createNotificationChannel(channel);
-            }
+            notificationManager.createNotificationChannel(channel);
         }
+
+        // Create an explicit intent to open the main activity
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        // Create the PendingIntent to launch the main activity
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Build the notification using NotificationCompat.Builder
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
-                .setSmallIcon(R.drawable.girl) // Set your app's notification icon
+                .setSmallIcon(R.drawable.notification_logo) // Set your app's notification icon
                 .setContentTitle(title)
                 .setContentText(body)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setAutoCancel(true);
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent);
 
         // Display the notification
+
+
+        int notificationId = generateNotificationId();
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -79,9 +86,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        int notificationId = generateNotificationId();
         notificationManager.notify(notificationId, builder.build());
     }
+
     private int generateNotificationId() {
         // Generate a random notification ID
         Random random = new Random();
