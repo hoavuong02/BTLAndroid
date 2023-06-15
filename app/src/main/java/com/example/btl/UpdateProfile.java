@@ -56,6 +56,10 @@ public class UpdateProfile extends AppCompatActivity {
                     public void onSuccess(Void aVoid) {
                         // Token deletion successful
                         FirebaseAuth.getInstance().signOut();
+                        Intent intent = new Intent(UpdateProfile.this, LoginActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        finishAffinity();
                     }
                 });
             }

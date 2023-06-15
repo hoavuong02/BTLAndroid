@@ -11,9 +11,9 @@
         android:id="@+id/imageViewSender"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@drawable/girl"
+        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true" />
+        android:src="@drawable/ic_launcher_background" />
 
     <TextView
         android:id="@+id/textViewSender"
