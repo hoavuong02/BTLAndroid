@@ -1,5 +1,6 @@
 package adapters;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -50,7 +51,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
     @Override
-        public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull MessageViewHolder holder, @SuppressLint("RecyclerView") int position) {
             Message message = messageList.get(position);
             FireStoreMethod fireStoreMethod = new FireStoreMethod();
             fireStoreMethod.getUserByUid(message.getSender(), new FireStoreMethod.DataCallback() {
