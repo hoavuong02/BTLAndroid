@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                     });
 
                     text.getText().clear();
-                    text.clearFocus();
+
 
                 }
             }
