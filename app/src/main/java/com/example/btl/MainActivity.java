@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -40,6 +41,7 @@ import java.util.Date;
 import java.util.List;
 
 import adapters.MessageAdapter;
+import de.hdodenhof.circleimageview.CircleImageView;
 import methods.FileHelper;
 import methods.FireStoreMethod;
 import methods.StorageMethod;
@@ -175,27 +177,32 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //logout section
-        Button btnLogout = findViewById(R.id.btnLogout);
+        //edit profile section
+        CircleImageView imgMyAvatar = findViewById(R.id.myAvatar);
+        fireStoreMethod.getUserByUid(FirebaseAuth.getInstance().getCurrentUser().getUid(), new FireStoreMethod.DataCallback() {
+            @Override
+            public void onDataLoaded(User user) {
+                Glide.with(MainActivity.this)
+                        .load(user.getPhotoUrl())
+                        .into(imgMyAvatar);
 
-        btnLogout.setOnClickListener(new View.OnClickListener() {
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
+
+        imgMyAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                CollectionReference usersRef = db.collection("users");
 
-                Task<Void> deleteTokenTask = usersRef.document(uid).update("token", null);
-                deleteTokenTask.addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        // Token deletion successful
-                        FirebaseAuth.getInstance().signOut();
-                    }
-                });
-                Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+                Intent intent = new Intent(MainActivity.this,UpdateProfile.class);
                 startActivity(intent);
-                finish();
+                intent.putExtra("uid", FirebaseAuth.getInstance().getCurrentUser().getUid());
+
             }
         });
     }

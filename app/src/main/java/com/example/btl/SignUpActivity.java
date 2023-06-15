@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -24,23 +23,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GetTokenResult;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import methods.FireStoreMethod;
 
 
 public class SignUpActivity extends AppCompatActivity {
@@ -68,10 +56,10 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
 
         textDirectLogin = findViewById(R.id.textDirectLogin);
-        editUserName = findViewById(R.id.editUserName);
+        editUserName = findViewById(R.id.editMyUserName);
         Imgavartar = findViewById(R.id.Imgavartar);
         avartarshow = findViewById(R.id.avartarshow);
-        editEmailSigUp = findViewById(R.id.editEmailSigUp);
+        editEmailSigUp = findViewById(R.id.editMyEmail);
         editPasswordSignUp = findViewById(R.id.editPasswordSignUp);
         editConfirmPassSignUp = findViewById(R.id.editConfirmPassSignUp);
         btnSignUpPrimary = findViewById(R.id.btnSignUpPrimary);
@@ -154,7 +142,7 @@ public class SignUpActivity extends AppCompatActivity {
                                         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
 
                                         // Tạo tên tệp tin duy nhất cho ảnh
-                                        String fileName = "image_" + System.currentTimeMillis() + ".jpg";
+                                        String fileName = "image_" + userId + ".jpg";
 
                                         // Tạo tham chiếu tới thư mục lưu trữ trong Firebase Storage
                                         StorageReference imageRef = storageRef.child("users/" + fileName);
