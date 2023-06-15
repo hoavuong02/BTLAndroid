@@ -144,20 +144,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         holder.imageViewSender.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!messageList.get(position).getSender().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-                    holder.imageViewSender.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            // Xử lý sự kiện khi người dùng nhấp vào hình ảnh imageViewSender
+                // Xử lý sự kiện khi người dùng nhấp vào hình ảnh imageViewSender
 
-                            // Tạo Intent để chuyển đến màn hình trang cá nhân và truyền thông tin người dùng
-                            Intent profileIntent = new Intent(activity, Personal_interface.class);
-                            profileIntent.putExtra("userName", userName);
-                            profileIntent.putExtra("photoUrl", photoUrl);
-                            activity.startActivity(profileIntent);
-                        }
-                    });
-                }
+                // Tạo Intent để chuyển đến màn hình trang cá nhân và truyền thông tin người dùng
+                Intent profileIntent = new Intent(activity, Personal_interface.class);
+                profileIntent.putExtra("userName", userName);
+                profileIntent.putExtra("photoUrl", photoUrl);
+                activity.startActivity(profileIntent);
             }
         });
     }
