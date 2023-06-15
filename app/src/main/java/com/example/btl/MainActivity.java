@@ -82,8 +82,9 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewMessages = findViewById(R.id.recycleViewMessage);
         recyclerViewMessages.setLayoutManager(new LinearLayoutManager(this));
         messageList = new ArrayList<>();
-        messageAdapter = new MessageAdapter(messageList,this);
+        messageAdapter = new MessageAdapter(messageList, this);
         recyclerViewMessages.setAdapter(messageAdapter);
+
 
         // Initialize FirebaseFirestore and collection reference
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -103,6 +104,11 @@ public class MainActivity extends AppCompatActivity {
                         Message message = document.toObject(Message.class);
                         if (message != null) {
                             messageList.add(message);
+//                          Scroll to the last item in the list
+                            RecyclerView.Adapter adapter = recyclerViewMessages.getAdapter();
+                            int itemCount = adapter.getItemCount();
+                            recyclerViewMessages.smoothScrollToPosition(itemCount - 1);
+
                         }
                     }
                     messageAdapter.notifyDataSetChanged();
