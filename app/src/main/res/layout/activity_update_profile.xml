@@ -96,7 +96,7 @@
         app:layout_constraintVertical_bias="0.259"
         app:srcCompat="@drawable/icon_img2" />
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/avartarshow"
         android:layout_width="100dp"
         android:layout_height="100dp"
