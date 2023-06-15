@@ -60,9 +60,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                         .load(user.getPhotoUrl())
                         .into(holder.imageViewSender);
                 holder.textViewSender.setText(user.getUsername());
-                // Đặt sự kiện nhấp vào imageViewSender
 
-                Personal_interface(holder, position, user.getUsername(), user.getPhotoUrl());
+
+
 
             }
 
@@ -98,6 +98,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                     .load(message.getmPhotoURL())
                     .into(holder.imageView);
         }
+
 
 
 
@@ -139,17 +140,24 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
 
     //Phan giao dien trang ca nhan BDT
 
-    public void Personal_interface(@NonNull MessageViewHolder holder, int position, String userName, String photoUrl) {
+    public void Personal_interface(@NonNull MessageViewHolder holder,  String userName, String photoUrl) {
         holder.imageViewSender.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Xử lý sự kiện khi người dùng nhấp vào hình ảnh imageViewSender
+                if (!messageList.get(position).getSender().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                    holder.imageViewSender.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            // Xử lý sự kiện khi người dùng nhấp vào hình ảnh imageViewSender
 
-                // Tạo Intent để chuyển đến màn hình trang cá nhân và truyền thông tin người dùng
-                Intent profileIntent = new Intent(activity, Personal_interface.class);
-                profileIntent.putExtra("userName", userName);
-                profileIntent.putExtra("photoUrl", photoUrl);
-                activity.startActivity(profileIntent);
+                            // Tạo Intent để chuyển đến màn hình trang cá nhân và truyền thông tin người dùng
+                            Intent profileIntent = new Intent(activity, Personal_interface.class);
+                            profileIntent.putExtra("userName", userName);
+                            profileIntent.putExtra("photoUrl", photoUrl);
+                            activity.startActivity(profileIntent);
+                        }
+                    });
+                }
             }
         });
     }

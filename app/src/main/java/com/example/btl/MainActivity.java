@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonSendFile;
     private FileHelper fileHelper;
     private StorageReference storageReference;
-    private DatabaseReference databaseReference;
+    private DatabaseReference databaseReferefnce;
     private ProgressDialog progressDialog;
 
     private static final int PICK_FILE_REQUEST = 438;
@@ -185,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
                 Glide.with(MainActivity.this)
                         .load(user.getPhotoUrl())
                         .into(imgMyAvatar);
+
 
             }
 
