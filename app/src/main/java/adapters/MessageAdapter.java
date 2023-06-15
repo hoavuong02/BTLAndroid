@@ -50,54 +50,59 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
-        Message message = messageList.get(position);
-        FireStoreMethod fireStoreMethod = new FireStoreMethod();
-        fireStoreMethod.getUserByUid(message.getSender(), new FireStoreMethod.DataCallback() {
-            @Override
-            public void onDataLoaded(User user) {
-                Glide.with(activity)
-                        .load(user.getPhotoUrl())
-                        .into(holder.imageViewSender);
-                holder.textViewSender.setText(user.getUsername());
-
-
-
-
-            }
-
-            @Override
-            public void onError(Exception e) {
-                holder.textViewSender.setText("");
-            }
-        });
-
-        if(!message.getText().toString().isEmpty()){
-            holder.textViewContent.setText(message.getText());
-            holder.imageView.setVisibility(View.GONE);
-            holder.btnDownload.setVisibility(View.GONE);
-        } else if (!message.getmFileURL().toString().isEmpty()) {
-
-            holder.textViewContent.setVisibility(View.GONE);
-            holder.imageView.setVisibility(View.GONE);
-            holder.btnDownload.setText(message.getmFileName());
-            holder.btnDownload.setOnClickListener(new View.OnClickListener() {
+        public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
+            Message message = messageList.get(position);
+            FireStoreMethod fireStoreMethod = new FireStoreMethod();
+            fireStoreMethod.getUserByUid(message.getSender(), new FireStoreMethod.DataCallback() {
                 @Override
-                public void onClick(View view) {
+                public void onDataLoaded(User user) {
+                    Glide.with(activity)
+                            .load(user.getPhotoUrl())
+                            .into(holder.imageViewSender);
+                    holder.textViewSender.setText(user.getUsername());
+                    String currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    if (!messageList.get(position).getSender().equals(currentUserUid)) {
+                        // Gọi phương thức Personal_interface chỉ khi không phải là người đăng nhập
+                        Personal_interface(holder, user.getUsername(), user.getPhotoUrl());
+                    }
 
-                    FileHelper fileHelper;
-                    fileHelper = new FileHelper( activity, holder.btnDownload);
-                    fileHelper.startDownload(message.getmFileURL());
+
+
 
                 }
+
+                @Override
+                public void onError(Exception e) {
+                    holder.textViewSender.setText("");
+                }
             });
-        } else if (!message.getmPhotoURL().isEmpty()) {
-            holder.textViewContent.setVisibility(View.GONE);
-            holder.btnDownload.setVisibility(View.GONE);
-            Glide.with(activity)
-                    .load(message.getmPhotoURL())
-                    .into(holder.imageView);
-        }
+
+            if(!message.getText().toString().isEmpty()){
+                holder.textViewContent.setText(message.getText());
+                holder.imageView.setVisibility(View.GONE);
+                holder.btnDownload.setVisibility(View.GONE);
+            } else if (!message.getmFileURL().toString().isEmpty()) {
+
+                holder.textViewContent.setVisibility(View.GONE);
+                holder.imageView.setVisibility(View.GONE);
+                holder.btnDownload.setText(message.getmFileName());
+                holder.btnDownload.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        FileHelper fileHelper;
+                        fileHelper = new FileHelper( activity, holder.btnDownload);
+                        fileHelper.startDownload(message.getmFileURL());
+
+                    }
+                });
+            } else if (!message.getmPhotoURL().isEmpty()) {
+                holder.textViewContent.setVisibility(View.GONE);
+                holder.btnDownload.setVisibility(View.GONE);
+                Glide.with(activity)
+                        .load(message.getmPhotoURL())
+                        .into(holder.imageView);
+            }
 
 
 
