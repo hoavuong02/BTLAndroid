@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -132,11 +133,49 @@ public class SignUpActivity extends AppCompatActivity {
             return;
         }
 
+      if(isValidEmail(email) == false){
+          Toast.makeText(this,"Invalid email", Toast.LENGTH_SHORT).show();
+          return;
+      }
+
+      if(isValidLength(username,1,30) == false){
+          Toast.makeText(this,"Length must be from 1 and less than 30 characters", Toast.LENGTH_SHORT).show();
+          return;
+      }
+
+        if(isValidLength(pass,6,30) == false){
+            Toast.makeText(this,"Length must be from 6 and less than 30 characters", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(isValidLength(confirmpass,6,30) == false){
+            Toast.makeText(this,"Length must be from 6 and less than 30 characters", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if(pass.equals(confirmpass)){
             mAuth.createUserWithEmailAndPassword(email,pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
+
+
                     if(task.isSuccessful()){
+
+                        // Gửi email xác minh
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            user.sendEmailVerification()
+                                    .addOnCompleteListener(emailTask -> {
+                                        if (emailTask.isSuccessful()) {
+                                            // Xử lý khi gửi email xác minh thành công
+                                            Toast.makeText(getApplicationContext(), "Gửi email xác minh thành công", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            // Xử lý khi gửi email xác minh thất bại
+                                            Toast.makeText(getApplicationContext(), "Gửi email xác minh thất bại", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        }
+
 
                         FirebaseMessaging.getInstance().getToken()
                                 .addOnCompleteListener(new OnCompleteListener<String>() {
@@ -165,6 +204,7 @@ public class SignUpActivity extends AppCompatActivity {
                                             @Override
                                             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                                                 if (task.isSuccessful()) {
+
                                                     // Lấy URL của ảnh đã tải lên từ Firebase Storage
                                                     imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                                         @Override
@@ -201,7 +241,7 @@ public class SignUpActivity extends AppCompatActivity {
                                 });
 
                         //thông báo tạo tài khoản thành công và chuyển hướng
-                        Toast.makeText(getApplicationContext(),"Create Account success :))", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext()," sigup successfully Please verify your account to log in", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(SignUpActivity.this,LoginActivity.class);
                         startActivity(intent);
                         finish();
@@ -240,6 +280,19 @@ public class SignUpActivity extends AppCompatActivity {
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, REQUEST_CODE_SELECT_IMAGE);
+    }
+
+
+    //VALIDATE
+    public boolean isValidEmail(String email) {
+        //phương thức EMAIL_ADDRESS của lớp Patterns để kiểm tra xem email có đúng định dạng email hay không.
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+    public boolean isValidLength(String text, int minLength, int maxLength) {
+
+        int length = text.length();
+        return length >= minLength && length < maxLength;
     }
 
 
