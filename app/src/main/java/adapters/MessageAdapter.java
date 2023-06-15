@@ -1,6 +1,7 @@
 package adapters;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.btl.MainActivity;
+import com.example.btl.Personal_interface;
 import com.example.btl.R;
 import com.example.btl.User;
 import com.google.firebase.auth.FirebaseAuth;
@@ -59,6 +60,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                         .load(user.getPhotoUrl())
                         .into(holder.imageViewSender);
                 holder.textViewSender.setText(user.getUsername());
+                // Đặt sự kiện nhấp vào imageViewSender
+
+                Personal_interface(holder, position, user.getUsername(), user.getPhotoUrl());
+
             }
 
             @Override
@@ -95,7 +100,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
         }
 
 
+
     }
+
+
 
     @Override
     public int getItemCount() {
@@ -127,5 +135,28 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             return MSG_TYPE_LEFT;
         }
     }
-}
+
+
+    //Phan giao dien trang ca nhan BDT
+
+    public void Personal_interface(@NonNull MessageViewHolder holder, int position, String userName, String photoUrl) {
+        holder.imageViewSender.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Xử lý sự kiện khi người dùng nhấp vào hình ảnh imageViewSender
+
+                // Tạo Intent để chuyển đến màn hình trang cá nhân và truyền thông tin người dùng
+                Intent profileIntent = new Intent(activity, Personal_interface.class);
+                profileIntent.putExtra("userName", userName);
+                profileIntent.putExtra("photoUrl", photoUrl);
+                activity.startActivity(profileIntent);
+            }
+        });
+    }
+
+
+    }
+
+
+
 
