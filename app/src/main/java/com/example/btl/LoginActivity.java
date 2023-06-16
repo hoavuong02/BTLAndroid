@@ -100,13 +100,17 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
+
+
         mAuth.signInWithEmailAndPassword(email,pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
+
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-                if (user.isEmailVerified()) { //phải xác minh account thì mới đăng nhập được
+
                     if (task.isSuccessful()) {
+                        if (user != null && user.isEmailVerified()) { //phải xác minh account thì mới đăng nhập được //user != null : điều này đảm bảo rằng đăng nhập thành công và có một đối tượng FirebaseUser hiện tại.
                         FirebaseMessaging.getInstance().getToken()
                                 .addOnCompleteListener(new OnCompleteListener<String>() {
                                     @Override
@@ -135,45 +139,22 @@ public class LoginActivity extends AppCompatActivity {
                                         }
                                     }
                                 });
+
                         //getApplicationContext(): Là một phương thức của Activity để lấy ra Context (ngữ cảnh) của ứng dụng.
                         Toast.makeText(getApplicationContext(), "Login successful :))", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();
-                    } else {
-                        Toast.makeText(getApplicationContext(), "email or password incorrect!!", Toast.LENGTH_SHORT).show();
                     }
-
+                        else{
+                            Toast.makeText(getApplicationContext(), "Please verify your account", Toast.LENGTH_SHORT).show();
+                        }
                 }
                 else{
-                    Toast.makeText(getApplicationContext(), "Please verify your account", Toast.LENGTH_SHORT).show();
-
+                        Toast.makeText(getApplicationContext(), "Email or password incorrect", Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
-
-
-//        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-//        if (user != null && !user.isEmailVerified()){
-//            long verificationRequestedAt = user.getMetadata().getCreationTimestamp();
-//            long currentTime = System.currentTimeMillis();
-//            long elapsedTime = currentTime - verificationRequestedAt;
-//
-//            if (elapsedTime > 1 * 60 * 1000) {
-//                user.delete()
-//                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                            @Override
-//                            public void onComplete(@NonNull Task<Void> task) {
-//                                if (task.isSuccessful()) {
-//                                    Toast.makeText(getApplicationContext(), "deleted account!!!", Toast.LENGTH_SHORT).show();
-//                                } else {
-//                                    // Xóa tài khoản thất bại
-//                                }
-//                            }
-//                        });
-//            }
-//        }
 
     }
 

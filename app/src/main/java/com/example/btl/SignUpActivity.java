@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -26,22 +25,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GetTokenResult;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import methods.FireStoreMethod;
 
 
 public class SignUpActivity extends AppCompatActivity {
@@ -69,10 +58,10 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
 
         textDirectLogin = findViewById(R.id.textDirectLogin);
-        editUserName = findViewById(R.id.editUserName);
+        editUserName = findViewById(R.id.editMyUserName);
         Imgavartar = findViewById(R.id.Imgavartar);
         avartarshow = findViewById(R.id.avartarshow);
-        editEmailSigUp = findViewById(R.id.editEmailSigUp);
+        editEmailSigUp = findViewById(R.id.editMyEmail);
         editPasswordSignUp = findViewById(R.id.editPasswordSignUp);
         editConfirmPassSignUp = findViewById(R.id.editConfirmPassSignUp);
         btnSignUpPrimary = findViewById(R.id.btnSignUpPrimary);
@@ -153,107 +142,115 @@ public class SignUpActivity extends AppCompatActivity {
             return;
         }
 
-        if(pass.equals(confirmpass)){
-            mAuth.createUserWithEmailAndPassword(email,pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
+        if(selectedImageUri != null){
+            if(pass.equals(confirmpass)){
+                mAuth.createUserWithEmailAndPassword(email,pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
 
 
-                    if(task.isSuccessful()){
+                        if(task.isSuccessful()){
 
-                        // Gửi email xác minh
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        if (user != null) {
-                            user.sendEmailVerification()
-                                    .addOnCompleteListener(emailTask -> {
-                                        if (emailTask.isSuccessful()) {
-                                            // Xử lý khi gửi email xác minh thành công
-                                            Toast.makeText(getApplicationContext(), "Gửi email xác minh thành công", Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            // Xử lý khi gửi email xác minh thất bại
-                                            Toast.makeText(getApplicationContext(), "Gửi email xác minh thất bại", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                        }
-
-
-                        FirebaseMessaging.getInstance().getToken()
-                                .addOnCompleteListener(new OnCompleteListener<String>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<String> task) {
-                                        if (!task.isSuccessful()) {
-                                            Log.w("MainActivity", "Failed to retrieve FCM registration token", task.getException());
-                                            return;
-                                        }
-
-                                        String token = task.getResult();
-
-                                        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                                        // Lấy tham chiếu tới Firebase Storage
-                                        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-
-                                        // Tạo tên tệp tin duy nhất cho ảnh
-                                        String fileName = "image_" + System.currentTimeMillis() + ".jpg";
-
-                                        // Tạo tham chiếu tới thư mục lưu trữ trong Firebase Storage
-                                        StorageReference imageRef = storageRef.child("users/" + fileName);
-
-                                        // Tải ảnh lên Firebase Storage
-                                        UploadTask uploadTask = imageRef.putFile(selectedImageUri);
-                                        uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                                                if (task.isSuccessful()) {
-
-                                                    // Lấy URL của ảnh đã tải lên từ Firebase Storage
-                                                    imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                                        @Override
-                                                        public void onSuccess(Uri downloadUri) {
-                                                            // Tạo đối tượng User với uid và token
-
-                                                            User user = new User(userId,username,email,downloadUri.toString(),token);
-                                                            // Lưu dữ liệu vào Cloud Firestore
-                                                            CollectionReference usersRef = db.collection("users");
-                                                            usersRef.document(userId).set(user)
-                                                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                        @Override
-                                                                        public void onSuccess(Void aVoid) {
-                                                                            // Xử lý thành công
-                                                                            Toast.makeText(getApplicationContext(), "Save data success. UserID: " + userId, Toast.LENGTH_SHORT).show();
-                                                                        }
-                                                                    })
-                                                                    .addOnFailureListener(new OnFailureListener() {
-                                                                        @Override
-                                                                        public void onFailure(@NonNull Exception e) {
-                                                                            // Xử lý khi thất bại
-                                                                            Toast.makeText(getApplicationContext(), "Save data failed", Toast.LENGTH_SHORT).show();
-                                                                        }
-                                                                    });
-                                                        }
-                                                    });
-                                                } else {
-                                                    // Xử lý lỗi nếu tải lên không thành công
-                                                    Toast.makeText(SignUpActivity.this, "Upload failed: " + task.getException(), Toast.LENGTH_SHORT).show();
-                                                }
+                            //Gửi email xác minh
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            if (user != null) {
+                                user.sendEmailVerification()
+                                        .addOnCompleteListener(emailTask -> {
+                                            if (emailTask.isSuccessful()) {
+                                                // Xử lý khi gửi email xác minh thành công
+                                                Toast.makeText(getApplicationContext(), "Gửi email xác minh thành công", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                // Xử lý khi gửi email xác minh thất bại
+                                                Toast.makeText(getApplicationContext(), "Gửi email xác minh thất bại", Toast.LENGTH_SHORT).show();
                                             }
                                         });
-                                    }
-                                });
+                            }
 
-                        //thông báo tạo tài khoản thành công và chuyển hướng
-                        Toast.makeText(getApplicationContext()," sigup successfully Please verify your account to log in", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(SignUpActivity.this,LoginActivity.class);
-                        startActivity(intent);
-                        finish();
+                            FirebaseMessaging.getInstance().getToken()
+                                    .addOnCompleteListener(new OnCompleteListener<String>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<String> task) {
+                                            if (!task.isSuccessful()) {
+                                                Log.w("MainActivity", "Failed to retrieve FCM registration token", task.getException());
+                                                return;
+                                            }
+
+                                            String token = task.getResult();
+
+                                            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                                            // Lấy tham chiếu tới Firebase Storage
+                                            StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+
+                                            // Tạo tên tệp tin duy nhất cho ảnh
+                                            String fileName = "image_" + userId + ".jpg";
+
+                                            // Tạo tham chiếu tới thư mục lưu trữ trong Firebase Storage
+                                            StorageReference imageRef = storageRef.child("users/" + fileName);
+
+                                            // Tải ảnh lên Firebase Storage
+                                            UploadTask uploadTask = imageRef.putFile(selectedImageUri);
+
+
+                                            uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                                                    if (task.isSuccessful()) {
+                                                        // Lấy URL của ảnh đã tải lên từ Firebase Storage
+                                                        imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                                            @Override
+                                                            public void onSuccess(Uri downloadUri) {
+                                                                // Tạo đối tượng User với uid và token
+
+                                                                User user = new User(userId,username,email,downloadUri.toString(),token);
+                                                                // Lưu dữ liệu vào Cloud Firestore
+                                                                CollectionReference usersRef = db.collection("users");
+                                                                usersRef.document(userId).set(user)
+                                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                            @Override
+                                                                            public void onSuccess(Void aVoid) {
+                                                                                // Xử lý thành công
+                                                                                Toast.makeText(getApplicationContext(), "Save data success. UserID: " + userId, Toast.LENGTH_SHORT).show();
+                                                                            }
+                                                                        })
+                                                                        .addOnFailureListener(new OnFailureListener() {
+                                                                            @Override
+                                                                            public void onFailure(@NonNull Exception e) {
+                                                                                // Xử lý khi thất bại
+                                                                                Toast.makeText(getApplicationContext(), "Save data failed", Toast.LENGTH_SHORT).show();
+                                                                            }
+                                                                        });
+                                                            }
+                                                        });
+                                                    } else {
+                                                        // Xử lý lỗi nếu tải lên không thành công
+                                                        Toast.makeText(SignUpActivity.this, "Upload failed: " + task.getException(), Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            });
+
+
+                                            //...
+                                        }
+                                    });
+
+                            //thông báo tạo tài khoản thành công và chuyển hướng
+                            Toast.makeText(getApplicationContext(),"Create Account success, Please verify to login :))", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(SignUpActivity.this,LoginActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                        else {
+                            Toast.makeText(getApplicationContext(),"Create Account failed!!", Toast.LENGTH_SHORT).show();
+                        }
+
                     }
-                    else {
-                        Toast.makeText(getApplicationContext(),"Create Account failed!!", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-        }
-        else{
-            Toast.makeText(getApplicationContext(), "Confirm Password does not match Password", Toast.LENGTH_SHORT).show();
+                });
+            }
+            else{
+                Toast.makeText(getApplicationContext(), "Confirm Password does not match Password", Toast.LENGTH_SHORT).show();
+            }
+        }else{
+            Toast.makeText(SignUpActivity.this, "Please choose your avatar !! " , Toast.LENGTH_SHORT).show();
         }
 
     }

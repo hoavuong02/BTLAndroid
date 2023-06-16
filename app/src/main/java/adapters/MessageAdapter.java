@@ -1,6 +1,7 @@
 package adapters;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.btl.MainActivity;
+import com.example.btl.Personal_interface;
 import com.example.btl.R;
 import com.example.btl.User;
 import com.google.firebase.auth.FirebaseAuth;
@@ -49,53 +50,66 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
-        Message message = messageList.get(position);
-        FireStoreMethod fireStoreMethod = new FireStoreMethod();
-        fireStoreMethod.getUserByUid(message.getSender(), new FireStoreMethod.DataCallback() {
-            @Override
-            public void onDataLoaded(User user) {
-                Glide.with(activity)
-                        .load(user.getPhotoUrl())
-                        .into(holder.imageViewSender);
-                holder.textViewSender.setText(user.getUsername());
-            }
-
-            @Override
-            public void onError(Exception e) {
-                holder.textViewSender.setText("");
-            }
-        });
-
-        if(!message.getText().toString().isEmpty()){
-            holder.textViewContent.setText(message.getText());
-            holder.imageView.setVisibility(View.GONE);
-            holder.btnDownload.setVisibility(View.GONE);
-        } else if (!message.getmFileURL().toString().isEmpty()) {
-
-            holder.textViewContent.setVisibility(View.GONE);
-            holder.imageView.setVisibility(View.GONE);
-            holder.btnDownload.setText(message.getmFileName());
-            holder.btnDownload.setOnClickListener(new View.OnClickListener() {
+        public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
+            Message message = messageList.get(position);
+            FireStoreMethod fireStoreMethod = new FireStoreMethod();
+            fireStoreMethod.getUserByUid(message.getSender(), new FireStoreMethod.DataCallback() {
                 @Override
-                public void onClick(View view) {
+                public void onDataLoaded(User user) {
+                    Glide.with(activity)
+                            .load(user.getPhotoUrl())
+                            .into(holder.imageViewSender);
+                    holder.textViewSender.setText(user.getUsername());
+                    String currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    if (!messageList.get(position).getSender().equals(currentUserUid)) {
+                        // Gọi phương thức Personal_interface chỉ khi không phải là người đăng nhập
+                        Personal_interface(holder, user.getUsername(), user.getPhotoUrl());
+                    }
 
-                    FileHelper fileHelper;
-                    fileHelper = new FileHelper( activity, holder.btnDownload);
-                    fileHelper.startDownload(message.getmFileURL());
+
+
 
                 }
+
+                @Override
+                public void onError(Exception e) {
+                    holder.textViewSender.setText("");
+                }
             });
-        } else if (!message.getmPhotoURL().isEmpty()) {
-            holder.textViewContent.setVisibility(View.GONE);
-            holder.btnDownload.setVisibility(View.GONE);
-            Glide.with(activity)
-                    .load(message.getmPhotoURL())
-                    .into(holder.imageView);
-        }
+
+            if(!message.getText().toString().isEmpty()){
+                holder.textViewContent.setText(message.getText());
+                holder.imageView.setVisibility(View.GONE);
+                holder.btnDownload.setVisibility(View.GONE);
+            } else if (!message.getmFileURL().toString().isEmpty()) {
+
+                holder.textViewContent.setVisibility(View.GONE);
+                holder.imageView.setVisibility(View.GONE);
+                holder.btnDownload.setText(message.getmFileName());
+                holder.btnDownload.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        FileHelper fileHelper;
+                        fileHelper = new FileHelper( activity, holder.btnDownload);
+                        fileHelper.startDownload(message.getmFileURL());
+
+                    }
+                });
+            } else if (!message.getmPhotoURL().isEmpty()) {
+                holder.textViewContent.setVisibility(View.GONE);
+                holder.btnDownload.setVisibility(View.GONE);
+                Glide.with(activity)
+                        .load(message.getmPhotoURL())
+                        .into(holder.imageView);
+            }
+
+
 
 
     }
+
+
 
     @Override
     public int getItemCount() {
@@ -127,5 +141,28 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
             return MSG_TYPE_LEFT;
         }
     }
-}
+
+
+    //Phan giao dien trang ca nhan BDT
+
+    public void Personal_interface(@NonNull MessageViewHolder holder,  String userName, String photoUrl) {
+        holder.imageViewSender.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Xử lý sự kiện khi người dùng nhấp vào hình ảnh imageViewSender
+
+                // Tạo Intent để chuyển đến màn hình trang cá nhân và truyền thông tin người dùng
+                Intent profileIntent = new Intent(activity, Personal_interface.class);
+                profileIntent.putExtra("userName", userName);
+                profileIntent.putExtra("photoUrl", photoUrl);
+                activity.startActivity(profileIntent);
+            }
+        });
+    }
+
+
+    }
+
+
+
 
