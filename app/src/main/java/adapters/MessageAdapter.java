@@ -1,7 +1,9 @@
 package adapters;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,7 +52,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     }
 
     @Override
-        public void onBindViewHolder(@NonNull MessageViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull MessageViewHolder holder, @SuppressLint("RecyclerView") int position) {
             Message message = messageList.get(position);
             FireStoreMethod fireStoreMethod = new FireStoreMethod();
             fireStoreMethod.getUserByUid(message.getSender(), new FireStoreMethod.DataCallback() {
@@ -65,10 +67,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                         // Gọi phương thức Personal_interface chỉ khi không phải là người đăng nhập
                         Personal_interface(holder, user.getUsername(), user.getPhotoUrl());
                     }
-
-
-
-
                 }
 
                 @Override
@@ -104,7 +102,16 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
                         .into(holder.imageView);
             }
 
+        // Get the width of the current device
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int deviceWidth = displayMetrics.widthPixels;
 
+        // Calculate the half width
+        int halfWidth = deviceWidth / 2;
+
+        // Set the maxWidth of textViewContent to half of the device's width
+        holder.textViewContent.setMaxWidth(halfWidth);
 
 
     }

@@ -8,12 +8,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -80,8 +82,9 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewMessages = findViewById(R.id.recycleViewMessage);
         recyclerViewMessages.setLayoutManager(new LinearLayoutManager(this));
         messageList = new ArrayList<>();
-        messageAdapter = new MessageAdapter(messageList,this);
+        messageAdapter = new MessageAdapter(messageList, this);
         recyclerViewMessages.setAdapter(messageAdapter);
+
 
         // Initialize FirebaseFirestore and collection reference
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -101,6 +104,11 @@ public class MainActivity extends AppCompatActivity {
                         Message message = document.toObject(Message.class);
                         if (message != null) {
                             messageList.add(message);
+//                          Scroll to the last item in the list
+                            RecyclerView.Adapter adapter = recyclerViewMessages.getAdapter();
+                            int itemCount = adapter.getItemCount();
+                            recyclerViewMessages.smoothScrollToPosition(itemCount - 1);
+
                         }
                     }
                     messageAdapter.notifyDataSetChanged();
@@ -134,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Please enter a message", Toast.LENGTH_SHORT).show();
                 } else if(!text.getText().toString().isEmpty() && imageUri ==null) {
                     fireStoreMethod.addMessage(text.getText().toString(), uid,"","","" ,new Date());
+                    //get all token except me
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
                     CollectionReference usersRef = db.collection("users");
 
@@ -171,11 +180,12 @@ public class MainActivity extends AppCompatActivity {
                     });
 
                     text.getText().clear();
-                    text.clearFocus();
+
 
                 }
             }
         });
+
 
         //edit profile section
         CircleImageView imgMyAvatar = findViewById(R.id.myAvatar);
@@ -185,8 +195,6 @@ public class MainActivity extends AppCompatActivity {
                 Glide.with(MainActivity.this)
                         .load(user.getPhotoUrl())
                         .into(imgMyAvatar);
-
-
             }
 
             @Override
@@ -219,5 +227,12 @@ public class MainActivity extends AppCompatActivity {
             imageUri=null;
         }
 
+    }
+    private void closeKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }
