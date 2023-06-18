@@ -68,7 +68,7 @@ public class ForgotPassActivity extends AppCompatActivity {
                     Intent intent = new Intent(ForgotPassActivity.this,LoginActivity.class);
                     startActivity(intent);
                 }else {
-                    Toast.makeText(ForgotPassActivity.this,"Error:((" + task.getException(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ForgotPassActivity.this,"Email does not exist !!", Toast.LENGTH_SHORT).show();
                 }
 
             }

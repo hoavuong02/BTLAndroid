@@ -142,10 +142,10 @@
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.472"
+        app:layout_constraintHorizontal_bias="0.34"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnSignUpPrimary"
-        app:layout_constraintVertical_bias="0.128" />
+        app:layout_constraintVertical_bias="0.14" />
 
     <TextView
         android:id="@+id/textDirectLogin"
@@ -157,10 +157,10 @@
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.813"
+        app:layout_constraintHorizontal_bias="0.76"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnSignUpPrimary"
-        app:layout_constraintVertical_bias="0.29" />
+        app:layout_constraintVertical_bias="0.23000002" />
 
     <ImageButton
         android:id="@+id/Imgavartar"

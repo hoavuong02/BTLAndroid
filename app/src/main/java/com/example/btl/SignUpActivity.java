@@ -216,7 +216,7 @@ public class SignUpActivity extends AppCompatActivity {
                                                                             @Override
                                                                             public void onFailure(@NonNull Exception e) {
                                                                                 // Xử lý khi thất bại
-                                                                                Toast.makeText(getApplicationContext(), "Save data failed", Toast.LENGTH_SHORT).show();
+                                                                                //Toast.makeText(getApplicationContext(), "Save data failed", Toast.LENGTH_SHORT).show();
                                                                             }
                                                                         });
                                                             }
@@ -240,7 +240,7 @@ public class SignUpActivity extends AppCompatActivity {
                             finish();
                         }
                         else {
-                            Toast.makeText(getApplicationContext(),"Create Account failed!!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(),"Account already exists!!", Toast.LENGTH_SHORT).show();
                         }
 
                     }
